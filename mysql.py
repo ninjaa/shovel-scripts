@@ -10,14 +10,14 @@ from time import gmtime, strftime
 import yaml
 import MySQLdb
 
-# the following line allows local imports from pwd
+shovelRootPath = os.path.dirname(os.path.abspath(__file__))
+
 if __package__ is None:
-    sys.path.append(os.path.dirname(
-        os.path.dirname(os.path.abspath(__file__))))
+    sys.path.append(shovelRootPath)
 
-from lib import run_shell_cmd
+from lib import get_strftime, run_shell_cmd
 
-configFileStream = file('config.yml', 'r')
+configFileStream = file(os.path.join(shovelRootPath,'config.yml'), 'r')
 config = yaml.load(configFileStream)
 
 
