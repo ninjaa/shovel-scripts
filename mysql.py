@@ -37,23 +37,30 @@ def dump(dbName, dbUsername=config["db_server_root_username"], dbPassword=config
         e = sys.exc_info()[0]
         print("Error: {exception}".format(exception=e))
 
-#@task
-#def import(dbName, dumpFilename, dbUsername=config["db_server_root_username"], dbPassword=config["db_server_root_password"], dbHost=config["db_server"], dumpFolder=config["db_dump_location"]):
-#    """ Function to import mysql db from dumpfile """
-#
-#    # if dumpFilename argument is an all numeric date suffix eg 20161111
-#    # create dumpFilename as eg dbName_2016111
-#    if len(dumpFilename) == 8 and dumpFilename.isdigit():
-#        dumpFilename = dbName + "_" + dumpFilename
-#
-#    # tacks on sql file extension if forgotten
-#    if len(dumpFilename) > 4 and dumpFilename[-4:] !== ".sql":
-#        dumpFilename = dumpFilename + ".sql"
-#
-#    dumpAbsolutePath = os.path.join(dumpFolder, dumpFilename)
-#    print(dumpAbsolutePath)
-#
-#
+
+@task
+def import_sql(
+    dbName, 
+    dumpFilename, 
+    dbUsername=config["db_server_root_username"], 
+    dbPassword=config["db_server_root_password"], 
+    dbHost=config["db_server"], 
+    dumpFolder=config["db_dump_location"]):
+    """ Function to import mysql db from dumpfile """
+    pass
+    # if dumpFilename argument is an all numeric date suffix eg 20161111
+    # create dumpFilename as eg dbName_2016111
+    if len(dumpFilename) == 8 and dumpFilename.isdigit():
+        dumpFilename = dbName + "_" + dumpFilename
+
+    # tacks on sql file extension if forgotten
+    if len(dumpFilename) > 4 and dumpFilename[-4:] != ".sql":
+        dumpFilename = dumpFilename + ".sql"
+
+    dumpAbsolutePath = os.path.join(dumpFolder, dumpFilename)
+    print(dumpAbsolutePath)
+
+
 
 @task
 def show_databases(dbUsername=config["db_server_root_username"], dbPassword=config["db_server_root_password"], dbHost=config["db_server"], dumpFolder=config["db_dump_location"]):
