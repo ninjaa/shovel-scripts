@@ -1,3 +1,5 @@
+# mysql.py
+
 import json
 import jinja2
 from subprocess import call, check_output, Popen, PIPE
@@ -23,20 +25,46 @@ config = yaml.load(configFileStream)
 
 
 @task
-def dump(dbName, dbUsername=config["db_server_root_username"], dbPassword=config["db_server_root_password"], dbHost=config["db_server"], dumpFolder=config["db_dump_location"]):
+def dump(dbName, 
+         dbUsername=config["db_server_root_username"], 
+         dbPassword=config["db_server_root_password"], 
+         dbHost=config["db_server"], 
+         dumpFolder=config["db_dump_location"],
+         forceOverwriteDumpfile=False
+        ):
     """ Function to dump mysql db to dump folder """
     dumpFilename = "{dbName}_{timeStr}.sql".format(
         dbName=dbName, timeStr=get_strftime())
     dumpAbsolutePath = os.path.join(dumpFolder, dumpFilename)
     print(dumpAbsolutePath)
-    try:
-        run_shell_cmd("mysqldump -u {dbUsername} -p'{dbPassword}' -h {dbHost} {dbName} > {dumpAbsolutePath}".format(
-            dbUsername=dbUsername, dbPassword=dbPassword, dbHost=dbHost, dbName=dbName, dumpAbsolutePath=dumpAbsolutePath))
-        print("successfully dumped {dbName} to {dumpAbsolutePath}".format(
-            dbName=dbName, dumpAbsolutePath=dumpAbsolutePath))
-    except:  # catch *all* exceptions
-        e = sys.exc_info()[0]
-        print("Error: {exception}".format(exception=e))
+    existsDumpAbsolutePath = os.path.isfile(dumpAbsolutePath)
+    if (
+        (not existsDumpAbsolutePath) or 
+        forceOverwriteDumpfile or 
+        (
+            existsDumpAbsolutePath and 
+            cmd_offer_boolean_choice(
+                "Dump file exists at {dumpAbsolutePath}. Overwrite it?".format(dumpAbsolutePath=dumpAbsolutePath)
+            )
+        )):
+        try:
+            run_shell_cmd(
+                "mysqldump -u {dbUsername} -p'{dbPassword}' -h {dbHost} {dbName} > {dumpAbsolutePath}".format(
+                    dbUsername=dbUsername, 
+                    dbPassword=dbPassword, 
+                    dbHost=dbHost, 
+                    dbName=dbName, 
+                    dumpAbsolutePath=dumpAbsolutePath)
+            )
+            print("successfully dumped {dbName} to {dumpAbsolutePath}".format(
+                dbName=dbName, 
+                dumpAbsolutePath=dumpAbsolutePath)
+            )
+        except:  # catch *all* exceptions
+            e = sys.exc_info()[0]
+            print("Error: {exception}".format(exception=e))
+    else:
+        print("User elected not to overwrite dumpfile. Exiting.")
 
 
 @task
@@ -46,7 +74,8 @@ def import_sql(
     dbUsername=config["db_server_root_username"], 
     dbPassword=config["db_server_root_password"], 
     dbHost=config["db_server"], 
-    dumpFolder=config["db_dump_location"]):
+    dumpFolder=config["db_dump_location"],
+    forceOverwriteExistingDb=False):
     """ Function to import mysql db from dumpfile """
     # if dumpFilename argument is an all numeric date suffix eg 20161111
     # create dumpFilename as eg dbName_2016111
@@ -64,7 +93,7 @@ def import_sql(
     print(mysqlDatabases)
 
     if dbName in mysqlDatabases:
-        if cmd_offer_boolean_choice("A MySQL Database with the name \"{dbName}\" already exists. Overwrite it?".format(dbName=dbName)):
+        if forceOverwriteExistingDb or cmd_offer_boolean_choice("A MySQL Database with the name \"{dbName}\" already exists. Overwrite it?".format(dbName=dbName)):
             print("should overwrite")
         else:
             print("should not overwrite")
