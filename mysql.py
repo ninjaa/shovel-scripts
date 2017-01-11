@@ -60,10 +60,16 @@ def import_sql(
     dumpAbsolutePath = os.path.join(dumpFolder, dumpFilename)
     print(dumpAbsolutePath)
 
-
+    mysqlDatabases = get_databases(dbUsername, dbPassword, dbHost)
+    print(mysqlDatabases)
 
 @task
-def show_databases(dbUsername=config["db_server_root_username"], dbPassword=config["db_server_root_password"], dbHost=config["db_server"], dumpFolder=config["db_dump_location"]):
+def show_databases(dbUsername=config["db_server_root_username"], dbPassword=config["db_server_root_password"], dbHost=config["db_server"]):
+    mysqlDatabases = get_databases(dbUsername, dbPassword, dbHost)
+    print("\n".join(mysqlDatabases))
+
+
+def get_databases(dbUsername=config["db_server_root_username"], dbPassword=config["db_server_root_password"], dbHost=config["db_server"]):
     db = MySQLdb.connect(
         host=dbHost,
         user=dbUsername,
@@ -81,6 +87,6 @@ def show_databases(dbUsername=config["db_server_root_username"], dbPassword=conf
 
     db.close()
     
-    print("\n".join(mysqlDatabases))
     return mysqlDatabases
+
 
