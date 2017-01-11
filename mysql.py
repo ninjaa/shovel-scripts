@@ -16,7 +16,7 @@ shovelRootPath = os.path.dirname(os.path.abspath(__file__))
 if __package__ is None:
     sys.path.append(shovelRootPath)
 
-from lib import get_strftime, run_shell_cmd
+from lib import cmd_offer_boolean_choice, get_strftime, run_shell_cmd
 
 configFileStream = file(os.path.join(shovelRootPath,'config.yml'), 'r')
 config = yaml.load(configFileStream)
@@ -64,14 +64,12 @@ def import_sql(
     print(mysqlDatabases)
 
     if dbName in mysqlDatabases:
-        print("A MySQL Database with the name \"{dbName}\" already exists. Overwrite it?".format(dbName=dbName))
-        choice = strtobool(raw_input())
-        if choice: 
-            print "should overwrite"
+        if cmd_offer_boolean_choice("A MySQL Database with the name \"{dbName}\" already exists. Overwrite it?".format(dbName=dbName)):
+            print("should overwrite")
         else:
-            print "should not overwrite"
+            print("should not overwrite")
     else:
-        print "No MySQL Database with the name \"{dbName} already exists. Create it first."
+        print("No MySQL Database with the name \"{dbName} already exists. Create it first.")
 
 
 @task
