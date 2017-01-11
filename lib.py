@@ -9,6 +9,7 @@ import os
 from time import gmtime, strftime
 import yaml
 import MySQLdb
+from distutils.util import strtobool
 
 shovelRootPath = os.path.dirname(os.path.abspath(__file__))
 
@@ -19,21 +20,24 @@ if __package__ is None:
 configFileStream = file(os.path.join(shovelRootPath,'config.yml'), 'r')
 config = yaml.load(configFileStream)
 
+def cmd_offer_boolean_choice(question):
+    print(question + " (Answer [Y/N] and press Enter) ")
+    return strtobool(raw_input())
 
-#@task
+# not a @task
 def get_strftime(timePattern="%Y%m%d"):
 	""" returns date string eg 20170107 """
 	timestr = strftime(timePattern, gmtime())
 	print(timestr)
 	return timestr
 
-#@task
+# not a @task
 def run_shell_cmd(cmd, printCmd=True):
     ''' helper function to run shell command v2 '''
     print(cmd)
     print(check_output(cmd, shell=True))
 
-#@task
+# not a @task
 def run_shell_command(cmdstr):
     ''' helper function to run shell command '''
     print("running command `{}`".format(cmdstr))
