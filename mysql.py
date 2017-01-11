@@ -9,6 +9,7 @@ import os
 from time import gmtime, strftime
 import yaml
 import MySQLdb
+from distutils.util import strtobool
 
 shovelRootPath = os.path.dirname(os.path.abspath(__file__))
 
@@ -47,7 +48,6 @@ def import_sql(
     dbHost=config["db_server"], 
     dumpFolder=config["db_dump_location"]):
     """ Function to import mysql db from dumpfile """
-    pass
     # if dumpFilename argument is an all numeric date suffix eg 20161111
     # create dumpFilename as eg dbName_2016111
     if len(dumpFilename) == 8 and dumpFilename.isdigit():
@@ -62,6 +62,17 @@ def import_sql(
 
     mysqlDatabases = get_databases(dbUsername, dbPassword, dbHost)
     print(mysqlDatabases)
+
+    if dbName in mysqlDatabases:
+        print("A MySQL Database with the name \"{dbName}\" already exists. Overwrite it?".format(dbName=dbName))
+        choice = strtobool(raw_input())
+        if choice: 
+            print "should overwrite"
+        else:
+            print "should not overwrite"
+    else:
+        print "No MySQL Database with the name \"{dbName} already exists. Create it first."
+
 
 @task
 def show_databases(dbUsername=config["db_server_root_username"], dbPassword=config["db_server_root_password"], dbHost=config["db_server"]):
