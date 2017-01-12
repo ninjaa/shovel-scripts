@@ -98,6 +98,18 @@ def create_db(dbName,
 
 
 @task
+def create_user(dbUsername,
+            dbUserHost='localhost',
+            dbPassword=False,
+            dbRootUsername=config["db_server_root_username"], 
+            dbRootPassword=config["db_server_root_password"], 
+            dbHost=config["db_server"]
+):
+        """ This function creates mysql dbUsername@dbUserHost on dbHost
+        """
+        pass
+
+@task
 def dump(dbName, 
          dbUsername=config["db_server_root_username"], 
          dbPassword=config["db_server_root_password"], 
@@ -171,7 +183,8 @@ def import_sql(
 
 
 @task
-def show_dbs(dbUsername=config["db_server_root_username"], dbPassword=config["db_server_root_password"], dbHost=config["db_server"]):
+def ls_dbs(dbUsername=config["db_server_root_username"], dbPassword=config["db_server_root_password"], dbHost=config["db_server"]):
+    """ Lists all dbs in dbHost """
     mysqlDbs = get_dbs(dbUsername, dbPassword, dbHost)
     print("\n".join(mysqlDbs))
     print("DONE")
@@ -200,7 +213,7 @@ def get_dbs(
     return mysqlDbs
     
 @task
-def show_users(dbUsername=config["db_server_root_username"], dbPassword=config["db_server_root_password"], dbHost=config["db_server"]):
+def ls_users(dbUsername=config["db_server_root_username"], dbPassword=config["db_server_root_password"], dbHost=config["db_server"]):
     """ Shows all mysql users """
     mysqlUsers = get_users(dbUsername, dbPassword, dbHost)
     
