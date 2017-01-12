@@ -105,7 +105,7 @@ def import_sql(
 def show_databases(dbUsername=config["db_server_root_username"], dbPassword=config["db_server_root_password"], dbHost=config["db_server"]):
     mysqlDatabases = get_databases(dbUsername, dbPassword, dbHost)
     print("\n".join(mysqlDatabases))
-
+    print("DONE")
 
 def get_databases(dbUsername=config["db_server_root_username"], dbPassword=config["db_server_root_password"], dbHost=config["db_server"]):
     db = MySQLdb.connect(
@@ -125,6 +125,39 @@ def get_databases(dbUsername=config["db_server_root_username"], dbPassword=confi
 
     db.close()
     
-    return mysqlDatabases
+@task
+def show_users(dbUsername=config["db_server_root_username"], dbPassword=config["db_server_root_password"], dbHost=config["db_server"]):
+    """ Shows all mysql users """
+    mysqlUsers = get_users(dbUsername, dbPassword, dbHost)
+    
+    print("MySQL users on {dbHost}:".format(dbHost=dbHost))
+    for username in mysqlUsers.keys():
+        for host in mysqlUsers[username].keys():
+            print("'{username}'@'{host}'".format(username=username, host=host))
+    
+    print("DONE")
 
+
+def get_users(dbUsername=config["db_server_root_username"], dbPassword=config["db_server_root_password"], dbHost=config["db_server"]):
+    db = MySQLdb.connect(
+        host=dbHost,
+        user=dbUsername,
+        passwd=dbPassword,
+        db="mysql")
+
+    cur = db.cursor()
+    # Use all the SQL you like
+    cur.execute("SELECT * FROM mysql.user;")
+
+    mysqlUsers = {}
+    for row in cur.fetchall():
+        username = row[1]
+        host = row[0]
+        if not username in mysqlUsers.keys():
+            mysqlUsers[username] = {}
+        mysqlUsers[username][host] = row
+
+    db.close()
+    
+    return mysqlUsers
 
