@@ -53,7 +53,7 @@ def get_dumpfile_absolute_path(
     return dumpAbsolutePath, dumpFilename, dumpFolder
 
 @task
-def create(dbName, 
+def create_db(dbName, 
            dumpFilename=False,
            dbRootUsername=config["db_server_root_username"], 
            dbRootPassword=config["db_server_root_password"], 
@@ -70,15 +70,15 @@ def create(dbName,
                 or an 8 digit date suffix such as 20161111, prompting a search for a dump file
                 dbName_suffix.sql
     """
-    mysqlDatabases = get_dbs(dbRootUsername, dbRootPassword, dbHost)
-    protectedMysqlDatabases = config["protected_mysql_dbs"]
-    if dbName in protectedMysqlDatabases:
+    mysqlDbs = get_dbs(dbRootUsername, dbRootPassword, dbHost)
+    protectedMysqlDbs = config["protected_mysql_dbs"]
+    if dbName in protectedMysqlDbs:
         raise NameError(
-            "{dbName} is in protected_mysql_dbs {protectedMysqlDatabases}".format(
+            "{dbName} is in protected_mysql_dbs {protectedMysqlDbs}".format(
                 dbName=dbName,
-                protectedMysqlDatabases=protectedMysqlDatabases)
+                protectedMysqlDbs=protectedMysqlDbs)
         )
-    if dbName in mysqlDatabases:
+    if dbName in mysqlDbs:
         print("WARNING: Mysql db {dbName} already exists, skipping create!".format(dbName=dbName))
     else:
         db = MySQLdb.connect(
@@ -158,10 +158,10 @@ def import_sql(
     dumpAbsolutepath, dumpFilename, dumpFolder = get_dumpfile_absolute_path(dumpFilename,
                                                                             dumpFolder)
 
-    mysqlDatabases = get_dbs(dbUsername, dbPassword, dbHost)
-    print(mysqlDatabases)
+    mysqlDbs = get_dbs(dbUsername, dbPassword, dbHost)
+    print(mysqlDbs)
 
-    if dbName in mysqlDatabases:
+    if dbName in mysqlDbs:
         if forceOverwriteExistingDb or cmd_offer_boolean_choice("A MySQL Database with the name \"{dbName}\" already exists. Overwrite it?".format(dbName=dbName)):
             print("should overwrite")
         else:
@@ -172,8 +172,8 @@ def import_sql(
 
 @task
 def show_dbs(dbUsername=config["db_server_root_username"], dbPassword=config["db_server_root_password"], dbHost=config["db_server"]):
-    mysqlDatabases = get_dbs(dbUsername, dbPassword, dbHost)
-    print("\n".join(mysqlDatabases))
+    mysqlDbs = get_dbs(dbUsername, dbPassword, dbHost)
+    print("\n".join(mysqlDbs))
     print("DONE")
 
 def get_dbs(
@@ -191,13 +191,13 @@ def get_dbs(
     # Use all the SQL you like
     cur.execute("SHOW DATABASES;")
 
-    mysqlDatabases = []
+    mysqlDbs = []
     for row in cur.fetchall():
         dbName = row[0]
-        mysqlDatabases.append(dbName)
+        mysqlDbs.append(dbName)
 
     db.close()
-    return mysqlDatabases
+    return mysqlDbs
     
 @task
 def show_users(dbUsername=config["db_server_root_username"], dbPassword=config["db_server_root_password"], dbHost=config["db_server"]):
