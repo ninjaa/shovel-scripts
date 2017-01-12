@@ -23,6 +23,79 @@ from lib import cmd_offer_boolean_choice, get_strftime, run_shell_cmd
 configFileStream = file(os.path.join(shovelRootPath,'config.yml'), 'r')
 config = yaml.load(configFileStream)
 
+if not "protected_mysql_dbs" in config.keys():
+    config["protected_mysql_dbs"] = ["information_schema", "performance_schema", "mysql"]
+
+def get_dumpfile_absolute_path(
+    dumpFilename, 
+    dumpFolder=config["db_dump_location"]):
+    """
+
+    Args:
+        dumpFilename:
+            is either an absolute path to an sql file, 
+            the name of an existing sql file in the optional dumpFolder, 
+            or an 8 digit date suffix such as 20161111, prompting a search for a dump file
+            dbName_suffix.sql
+    """
+    # Get dumpAbsolutePath from dumbFilename and dumpFolder
+    if os.path.isfile(dumpFilename):
+        dumpAbsolutePath = dumpFilename
+        dumpFolder = os.path.dirname(dumpAbsolutePath)
+        dumpFilename = os.path.basename(dumpAbsolutePath)
+    else:
+        # tacks on sql file extension if forgotten
+        if len(dumpFilename) > 4 and dumpFilename[-4:] != ".sql":
+            dumpFilename = dumpFilename + ".sql"
+
+        dumpAbsolutePath = os.path.join(dumpFolder, dumpFilename)
+
+    return dumpAbsolutePath, dumpFilename, dumpFolder
+
+@task
+def create(dbName, 
+           dumpFilename=False,
+           dbRootUsername=config["db_server_root_username"], 
+           dbRootPassword=config["db_server_root_password"], 
+           dbHost=config["db_server"], 
+           dumpFolder=config["db_dump_location"],
+          ):
+    """ Creates a new mysql db with dbName and imports initial data from dumpFilename 
+
+        Args:
+            dbName: name of DB to create (required)
+            dumpFilename:
+                is either an absolute path to an sql file, 
+                the name of an existing sql file in the optional dumpFolder, 
+                or an 8 digit date suffix such as 20161111, prompting a search for a dump file
+                dbName_suffix.sql
+    """
+    mysqlDatabases = get_dbs(dbRootUsername, dbRootPassword, dbHost)
+    protectedMysqlDatabases = config["protected_mysql_dbs"]
+    if dbName in protectedMysqlDatabases:
+        raise NameError(
+            "{dbName} is in protected_mysql_dbs {protectedMysqlDatabases}".format(
+                dbName=dbName,
+                protectedMysqlDatabases=protectedMysqlDatabases)
+        )
+    if dbName in mysqlDatabases:
+        print("WARNING: Mysql db {dbName} already exists, skipping create!".format(dbName=dbName))
+    else:
+        db = MySQLdb.connect(
+            host=dbHost,
+            user=dbRootUsername,
+            passwd=dbRootPassword,
+            db="mysql")
+
+        cur = db.cursor()
+
+        cur.execute("CREATE DATABASE IF NOT EXISTS {dbName};".format(dbName=dbName))
+        print("Created MySQL db {dbName}".format(dbName=dbName))
+
+    if dumpFilename:
+        import_sql(dbName, dumpFilename, dbRootUsername, dbRootPassword, dbHost, dumpFolder,
+               forceOverwriteExistingDb=True)
+
 
 @task
 def dump(dbName, 
@@ -82,14 +155,10 @@ def import_sql(
     if len(dumpFilename) == 8 and dumpFilename.isdigit():
         dumpFilename = dbName + "_" + dumpFilename
 
-    # tacks on sql file extension if forgotten
-    if len(dumpFilename) > 4 and dumpFilename[-4:] != ".sql":
-        dumpFilename = dumpFilename + ".sql"
+    dumpAbsolutepath, dumpFilename, dumpFolder = get_dumpfile_absolute_path(dumpFilename,
+                                                                            dumpFolder)
 
-    dumpAbsolutePath = os.path.join(dumpFolder, dumpFilename)
-    print(dumpAbsolutePath)
-
-    mysqlDatabases = get_databases(dbUsername, dbPassword, dbHost)
+    mysqlDatabases = get_dbs(dbUsername, dbPassword, dbHost)
     print(mysqlDatabases)
 
     if dbName in mysqlDatabases:
@@ -98,16 +167,20 @@ def import_sql(
         else:
             print("should not overwrite")
     else:
-        print("No MySQL Database with the name \"{dbName} already exists. Create it first.")
+        print("No MySQL Database with the name \"{dbName} does not exist. Create it first.")
 
 
 @task
-def show_databases(dbUsername=config["db_server_root_username"], dbPassword=config["db_server_root_password"], dbHost=config["db_server"]):
-    mysqlDatabases = get_databases(dbUsername, dbPassword, dbHost)
+def show_dbs(dbUsername=config["db_server_root_username"], dbPassword=config["db_server_root_password"], dbHost=config["db_server"]):
+    mysqlDatabases = get_dbs(dbUsername, dbPassword, dbHost)
     print("\n".join(mysqlDatabases))
     print("DONE")
 
-def get_databases(dbUsername=config["db_server_root_username"], dbPassword=config["db_server_root_password"], dbHost=config["db_server"]):
+def get_dbs(
+    dbUsername=config["db_server_root_username"], 
+    dbPassword=config["db_server_root_password"], 
+    dbHost=config["db_server"]
+):
     db = MySQLdb.connect(
         host=dbHost,
         user=dbUsername,
@@ -124,6 +197,7 @@ def get_databases(dbUsername=config["db_server_root_username"], dbPassword=confi
         mysqlDatabases.append(dbName)
 
     db.close()
+    return mysqlDatabases
     
 @task
 def show_users(dbUsername=config["db_server_root_username"], dbPassword=config["db_server_root_password"], dbHost=config["db_server"]):
