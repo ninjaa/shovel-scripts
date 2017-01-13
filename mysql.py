@@ -45,11 +45,13 @@ def get_dumpfile_absolute_path(
         dumpFilename = os.path.basename(dumpAbsolutePath)
     else:
         # tacks on sql file extension if forgotten
-        if len(dumpFilename) > 4 and dumpFilename[-4:] != ".sql":
+        if len(dumpFilename) >= 4 and dumpFilename[-4:] != ".sql":
             dumpFilename = dumpFilename + ".sql"
 
         dumpAbsolutePath = os.path.join(dumpFolder, dumpFilename)
 
+    print dumpAbsolutePath
+    print dumpFilename
     return dumpAbsolutePath, dumpFilename, dumpFolder
 
 @task
@@ -118,6 +120,8 @@ def dump(dbName,
          forceOverwriteDumpfile=False
         ):
     """ Function to dump mysql db to dump folder """
+    # @TODO Add ROW_FORMAT modifier to dump
+    # http://stackoverflow.com/questions/8243973/force-row-format-on-mysqldump
     dumpFilename = "{dbName}_{timeStr}.sql".format(
         dbName=dbName, timeStr=get_strftime())
     dumpAbsolutePath = os.path.join(dumpFolder, dumpFilename)
@@ -167,15 +171,23 @@ def import_sql(
     if len(dumpFilename) == 8 and dumpFilename.isdigit():
         dumpFilename = dbName + "_" + dumpFilename
 
-    dumpAbsolutepath, dumpFilename, dumpFolder = get_dumpfile_absolute_path(dumpFilename,
+    dumpAbsolutePath, dumpFilename, dumpFolder = get_dumpfile_absolute_path(dumpFilename,
                                                                             dumpFolder)
 
+    #print dumpAbsolutePath
+
     mysqlDbs = get_dbs(dbUsername, dbPassword, dbHost)
-    print(mysqlDbs)
+    #print(mysqlDbs)
 
     if dbName in mysqlDbs:
         if forceOverwriteExistingDb or cmd_offer_boolean_choice("A MySQL Database with the name \"{dbName}\" already exists. Overwrite it?".format(dbName=dbName)):
-            print("should overwrite")
+            mysqlImportCmd = "mysql -u {dbUsername} -p'{dbPassword}' -h {dbHost} {dbName} < {dumpAbsolutePath}".format(dbUsername=dbUsername,
+                                                                                                                      dbPassword=dbPassword,
+                                                                                                                      dbHost=dbHost,
+                                                                                                                      dbName=dbName,
+                                                                                                                      dumpAbsolutePath=dumpAbsolutePath)
+            print(mysqlImportCmd)
+            run_shell_cmd(mysqlImportCmd)
         else:
             print("should not overwrite")
     else:
