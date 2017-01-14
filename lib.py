@@ -51,3 +51,13 @@ def run_shell_command(cmdstr):
     print("exitcode {}, stdout {}, stderr {}".format(exitcode, out, err))
     return exitcode, out, err
 
+@task
+def gen_sha1(rawPassword, forceUppercase=False):
+    ''' Task takes a rawPassword as required argument and returns and prints out a SHA1 hash.
+    Optional second boolean argument for forcing an Uppercase hash '''
+    if forceUppercase:
+        genSha1PwCmd = "echo -n {rawPassword} | sha1sum | awk '{{print toupper($1)}}'".format(rawPassword=rawPassword)
+    else:
+        genSha1PwCmd = "echo -n {rawPassword} | sha1sum | awk '{{print $1}}'".format(rawPassword=rawPassword)
+
+    run_shell_cmd(genSha1PwCmd)
