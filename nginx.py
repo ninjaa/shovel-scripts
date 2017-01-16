@@ -20,6 +20,8 @@ from lib import (
     cmd_offer_boolean_choice, 
     CONFIG, 
     get_strftime, 
+    LINUX_DISTRO_FLAVOR,
+    LINUX_DISTRO_VERSION,
     MY_SHOVEL_ROOT_DIR,
     run_shell_cmd,
     TEMPLATE_DIR,
@@ -28,7 +30,7 @@ from lib import (
 @task
 def install_nginx_conf():
     """ Overwrites byobu's bashrc with canonical version from tplDir """
-    srcPath = os.path.join(TEMPLATE_DIR, "nginx.conf.{env}.example".format(env=CONFIG["env"]))
+    srcPath = os.path.join(TEMPLATE_DIR, LINUX_DISTRO_FLAVOR, "nginx.conf.{env}.example".format(env=CONFIG["env"]))
     destPath = "/etc/nginx/nginx.conf"
     owCmd = "sudo cp {srcPath} {destPath}".format(
         srcPath=srcPath,

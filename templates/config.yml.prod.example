@@ -1,1 +1,13 @@
-config.yml.dev.example
+db_dump_location: /srv/www/dbdumps
+db_server: localhost
+db_server_root_password: DB_ROOT_PASS
+db_server_root_username: root
+env: staging
+nginx_grp: www-data
+nginx_user: www-data
+ssh_grp: opsworks
+tld: tutoringclub.com
+www_dir: public_html
+www_grp: ec2-user
+www_root: /srv/www
+www_user: ec2-user

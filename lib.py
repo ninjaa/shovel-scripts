@@ -7,6 +7,7 @@ import shlex
 from shovel import task
 import sys
 import os
+import platform
 #import ruamel.yaml
 from time import gmtime, strftime
 import yaml
@@ -15,6 +16,7 @@ from distutils.util import strtobool
 
 MY_HOME_DIR = os.environ['HOME']
 MY_SHOVEL_ROOT_DIR = os.path.join(MY_HOME_DIR, ".shovel")
+CONFIG_FILE_PATH = os.path.join(MY_SHOVEL_ROOT_DIR, "config.yml")
 TEMPLATE_DIR = os.path.join(MY_SHOVEL_ROOT_DIR, "templates")
 
 # the following line allows local imports from pwd
@@ -22,11 +24,20 @@ if __package__ is None:
     sys.path.append(MY_SHOVEL_ROOT_DIR)
 
 def load_config():
-    configFileReader = file(os.path.join(MY_SHOVEL_ROOT_DIR,'config.yml'), 'r')
+    configFileReader = file(CONFIG_FILE_PATH, 'r')
     config = yaml.load(configFileReader)
     return config
 
 CONFIG = load_config()
+
+LINUX_DISTRO_TUPLE = platform.linux_distribution()
+LINUX_DISTRO_FULL_FLAVOR = LINUX_DISTRO_TUPLE[0]
+LINUX_DISTRO_VERSION = LINUX_DISTRO_TUPLE[1]
+
+if LINUX_DISTRO_FULL_FLAVOR == 'Red Hat Enterprise Linux':
+    LINUX_DISTRO_FLAVOR = 'rhel'
+elif LINUX_DISTRO_FULL_FLAVOR == 'Ubuntu':
+    LINUX_DISTRO_FLAVOR = 'ubuntu'
 
 #scriptPath = os.path.dirname(os.path.abspath(__file__))
 
@@ -59,6 +70,40 @@ def run_shell_command(cmdstr):
     exitcode = proc.returncode
     print("exitcode {}, stdout {}, stderr {}".format(exitcode, out, err))
     return exitcode, out, err
+
+@task
+def gen_cfg_yml():
+    ''' Generate config.yml from tpl '''
+    pass
+
+@task
+def show_cfg():
+    ''' Print config variables in config.yml '''
+    print(CONFIG)
+
+@task
+def update_cfg_yml():
+    ''' update config.yml '''
+    madeChanges = False
+
+    for key, data in CONFIG.items():
+        print("CONFIG['{key}']=\"{data}\"".format(key=key, data=data))
+        if cmd_offer_boolean_choice("Update CONFIG['{key}']?".format(key=key)):
+            print("Enter new value for CONFIG['{key}'] and then press enter:")
+            CONFIG[key] = raw_input()
+            madeChanges = True
+
+    if madeChanges or cmd_offer_boolean_choice("Write new config.yml file despite no changes?"):
+        if not os.path.isfile(CONFIG_FILE_PATH):
+            print("No existing config.yml found at {cfp}, creating it").format(cfp=CONFIG_FILE_PATH)
+            newconfigFilePatah = CONFIG_FILE_PATH
+        else:
+            print("Existing config.yml found at {cfp}, so creating new.config.yml").format(cfp=CONFIG_FILE_PATH)
+            newConfigFilePath = os.path.join(MY_SHOVEL_ROOT_DIR, "new.config.yml")
+
+        with open(newConfigFilePath, 'w') as newConfigFileWriter:
+            yaml.dump(CONFIG, newConfigFileWriter, default_flow_style=False)
+            print("Dumped new config.yml to #{newConfigFilePath}")
 
 @task
 def gen_sha1(rawPassword, forceUppercase=False):
