@@ -13,14 +13,21 @@ import yaml
 import MySQLdb
 from distutils.util import strtobool
 
-shovelRootPath = os.path.dirname(os.path.abspath(__file__))
+MY_HOME_DIR = os.environ['HOME']
+MY_SHOVEL_ROOT_DIR = os.path.join(MY_HOME_DIR, ".shovel")
 
 # the following line allows local imports from pwd
 if __package__ is None:
-    sys.path.append(shovelRootPath)
+    sys.path.append(MY_SHOVEL_ROOT_DIR)
 
-configFileStream = file(os.path.join(shovelRootPath,'config.yml'), 'r')
-config = yaml.load(configFileStream)
+def load_config():
+    configFileReader = file(os.path.join(MY_SHOVEL_ROOT_DIR,'config.yml'), 'r')
+    config = yaml.load(configFileReader)
+    return config
+
+CONFIG = load_config()
+
+#scriptPath = os.path.dirname(os.path.abspath(__file__))
 
 def cmd_offer_boolean_choice(question):
     print(question + " (Answer [Y/N] and press Enter) ")
@@ -32,6 +39,7 @@ def get_strftime(timePattern="%Y%m%d"):
 	timestr = strftime(timePattern, gmtime())
 	print(timestr)
 	return timestr
+
 
 # not a @task
 def run_shell_cmd(cmd, printCmd=True):
