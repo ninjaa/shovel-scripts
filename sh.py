@@ -28,7 +28,7 @@ from lib import (
 def install_byobu_bashrc():
     """ Overwrites byobu's bashrc with canonical version from tplDir """
     tplDir = os.path.join(MY_SHOVEL_ROOT_DIR, "templates")
-    tplBashrcPath = os.path.join(tplDir, "bashrc")
+    tplBashrcPath = os.path.join(tplDir, "bashrc.{env}.example".format(env=CONFIG["env"]))
     byobuBashrcPath = "/usr/share/byobu/profiles/bashrc"
     owByobuBashrcCmd = "sudo cp {tplBashrcPath} {byobuBashrcPath}".format(
         tplBashrcPath=tplBashrcPath,
