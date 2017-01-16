@@ -25,7 +25,3 @@ from lib import (
 )
 
 
-# adds shovel root path to PYTHONPATH, allowing relative imports from ~/.shovel
-if __package__ is None:
-    sys.path.append(MY_SHOVEL_ROOT_DIR)
-
