@@ -15,6 +15,7 @@ from distutils.util import strtobool
 
 MY_HOME_DIR = os.environ['HOME']
 MY_SHOVEL_ROOT_DIR = os.path.join(MY_HOME_DIR, ".shovel")
+TEMPLATE_DIR = os.path.join(MY_SHOVEL_ROOT_DIR, "templates")
 
 # the following line allows local imports from pwd
 if __package__ is None:
