@@ -3,6 +3,7 @@
 
 # ## Absolute imports
 from distutils.util import strtobool
+import fnmatch
 import json
 import jinja2
 import MySQLdb
@@ -10,6 +11,7 @@ import os
 from subprocess import call, check_output, Popen, PIPE
 import shlex
 from shovel import task
+from shutil import copyfile
 import sys
 from time import gmtime, strftime
 import yaml
