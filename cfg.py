@@ -24,4 +24,37 @@ from lib import (
     run_shell_cmd,
 )
 
+@task
+def ow_dot_examples(appName, env="dev", tld="1stopmart.in", wwwRoot="/var/www", wwwDir="public_html"):
+    '''Overwrite every filename with filename.{env}.examples if one is found in that folder
+    
+    This command will scan the directory /{wwwRoot}/{appName}{tld}/{wwwDir} and copy over all files named *.{env}.example to the name of the file
+
+    It takes 5 arguments, 4 arguments are mandatory:
+    - appName
+    - env defaults to "dev"
+    - tld defaults to "1stopmart.in"
+    - wwwRoot defaults to "/srv/www"
+    - wwwDir = "public_html"
+
+
+    Examples:
+        bmro cfg.overwrite_examples www2
+
+    '''
+    devFolderName = "{appName}.{tld}".format(appName=appName, tld=tld)
+    devRootPath = os.path.join("/", wwwRoot, devFolderName)
+    devWebRootPath = os.path.join(devRootPath, wwwDir)
+    searchPattern = "*.{env}.example".format(env=env)
+    matches = []
+    for root, dirnames, filenames in os.walk(devWebRootPath):
+        for filename in fnmatch.filter(filenames, searchPattern):
+            matches.append(os.path.join(root, filename))
+
+    print(matches)
+
+    for srcFile in matches:
+        destFile = srcFile.replace(".{env}.example".format(env=env), "")
+        print("cp {srcFile} to {destFile}".format(srcFile=srcFile, destFile=destFile))
+        copyfile(srcFile, destFile)
 

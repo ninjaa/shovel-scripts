@@ -2,8 +2,12 @@
 
 ## Steps to configure a new shell account
 
-- ssh-add your key
-- 
+- ssh-add your key to ssh-agent for now
+- Install shovel from src https://github.com/seomoz/shovel
+- Git clone this repo to ~/.shovel
+- ```$> shovel sh.install_byobu_bashrc```
+
+## Steps to install Shovel
 
 
 ## Steps to install VIM
