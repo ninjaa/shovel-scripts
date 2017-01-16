@@ -80,3 +80,4 @@ alias checkout='git checkout'
 alias ll='ls -al'
 
 export JAVA_HOME="/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.121-2.6.8.0.el7_3.x86_64"
+. /usr/share/autojump/autojump.sh
