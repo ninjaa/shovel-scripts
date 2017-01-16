@@ -25,21 +25,27 @@ from lib import (
 )
 
 @task
-def ow_dot_examples(appName, env="dev", tld="1stopmart.in", wwwRoot="/var/www", wwwDir="public_html"):
+def ow_dot_examples(
+    appName,
+    env=CONFIG['env'],
+    tld=CONFIG['tld'],
+    wwwRoot=CONFIG['www_root'],
+    wwwDir=CONFIG['www_dir'],
+):
     '''Overwrite every filename with filename.{env}.examples if one is found in that folder
     
     This command will scan the directory /{wwwRoot}/{appName}{tld}/{wwwDir} and copy over all files named *.{env}.example to the name of the file
 
     It takes 5 arguments, 4 arguments are mandatory:
     - appName
-    - env defaults to "dev"
-    - tld defaults to "1stopmart.in"
-    - wwwRoot defaults to "/srv/www"
-    - wwwDir = "public_html"
+    - env defaults to CONFIG['env']
+    - tld defaults to CONFIG['tld']
+    - wwwRoot defaults to CONFIG['www_root']
+    - wwwDir = CONFIG['www_dir']
 
 
     Examples:
-        bmro cfg.overwrite_examples www2
+        bmro cfg.ow_dot_examples www2 
 
     '''
     devFolderName = "{appName}.{tld}".format(appName=appName, tld=tld)
