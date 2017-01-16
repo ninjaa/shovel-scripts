@@ -1,0 +1,82 @@
+#    byobu's bashrc -- colorize the prompt
+#    Copyright (C) 2013 Dustin Kirkland
+#
+#    Authors: Dustin Kirkland <kirkland@byobu.co>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, version 3 of the License.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+parse_git_branch() {
+     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+}
+# Ensure that we're in a tmux or screen session
+case "$TERM" in
+	xterm)
+		# Try to ensure we have 256 colors
+		export TERM="xterm-256color"
+	;;
+esac
+if [ -n "$TMUX" ] || [ "${TERMCAP#*screen}" != "${TERMCAP}" ]; then
+	# Ensure that we're in bash, in a byobu environment
+	if [ -n "$BYOBU_BACKEND" ] && [ -n "$BASH" ]; then
+		byobu_prompt_status() { local e=$?; [ $e != 0 ] && echo -e "$e "; }
+		case "$BYOBU_DISTRO" in
+			"Ubuntu")
+				# Use Ubuntu colors (grey / aubergine / orange)
+				[ -n "$BYOBU_CHARMAP" ] || BYOBU_CHARMAP=$(locale charmap 2>/dev/null || echo)
+				case "$BYOBU_CHARMAP" in
+					"UTF-8")
+						# MATHEMATICAL RIGHT DOUBLE ANGLE BRACKET (U+27EB, Pe): ⟫
+						PS1="${debian_chroot:+($debian_chroot)}\[\e[38;5;202m\]\$(byobu_prompt_status)\[\e[38;5;245m\]\u\[\e[00m\]@\[\e[38;5;5m\]\h\[\e[00m\]:\[\e[38;5;172m\]\w\[\e[00m\]⟫ "
+					;;
+					*)
+						# Simple ASCII greater-than sign
+						PS1="${debian_chroot:+($debian_chroot)}\[\e[38;5;202m\]\$(byobu_prompt_status)\[\e[38;5;245m\]\u\[\e[00m\]@\[\e[38;5;5m\]\h\[\e[00m\]:\[\e[38;5;172m\]\w\[\e[00m\]> "
+					;;
+				esac
+				export GREP_COLORS="ms=01;38;5;202:mc=01;31:sl=:cx=:fn=01;38;5;132:ln=32:bn=32:se=00;38;5;242"
+				export LESS_TERMCAP_mb=$(printf '\e[01;31m')       # enter blinking mode – red
+				export LESS_TERMCAP_md=$(printf '\e[01;38;5;180m') # enter double-bright mode – bold light orange
+				export LESS_TERMCAP_me=$(printf '\e[0m')           # turn off all appearance modes (mb, md, so, us)
+				export LESS_TERMCAP_se=$(printf '\e[0m')           # leave standout mode
+				export LESS_TERMCAP_so=$(printf '\e[03;38;5;202m') # enter standout mode – orange background highlight (or italics)
+				export LESS_TERMCAP_ue=$(printf '\e[0m')           # leave underline mode
+				export LESS_TERMCAP_us=$(printf '\e[04;38;5;139m') # enter underline mode – underline aubergine
+			;;
+			*)
+				# Use Byobu colors (green / blue / red)
+				PS1="${debian_chroot:+($debian_chroot)}\[\e[31m\]\$(byobu_prompt_status)\[\e[00;32m\]\u\[\e[00m\]@\[\e[00;36m\]\h\[\e[00m\]:\[\e[00;31m\]\w\[\e[00m\] \[\033[33m\]\$(parse_git_branch)\[\033[00m\] $ "
+			;;
+		esac
+	fi
+fi
+
+alias st='git status'
+alias g='git'
+alias log='git log | less'
+alias opsworks-cli='sudo opsworks-agent-cli'
+alias get_json='sudo opsworks-agent-cli get_json'
+alias gj='sudo opsworks-agent-cli get_json'
+alias lc='sudo opsworks-agent-cli list_commands'
+alias ucc='sudo opsworks-agent-cli run_command update_custom_cookbooks'
+alias bmro='shovel'
+alias b='shovel'
+alias s='sudo'
+alias start='sudo systemctl start'
+alias stop='sudo systemctl stop'
+alias restart='sudo systemctl restart'
+alias pull='git pull'
+alias push='git push'
+alias checkout='git checkout'
+alias ll='ls -al'
+
+export JAVA_HOME="/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.121-2.6.8.0.el7_3.x86_64"

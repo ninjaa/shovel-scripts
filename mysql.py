@@ -1,4 +1,4 @@
-# mysql.py
+# # mysql.py - MySQL DB tasks and helper functions
 
 import json
 import jinja2

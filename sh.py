@@ -1,4 +1,4 @@
-# # cfg.py - Tasks and helpers that configure an application instance
+# # sh.py - Tasks and helpers to configure my shell
 
 
 # ## Absolute imports
@@ -24,8 +24,15 @@ from lib import (
     run_shell_cmd,
 )
 
-
-# adds shovel root path to PYTHONPATH, allowing relative imports from ~/.shovel
-if __package__ is None:
-    sys.path.append(MY_SHOVEL_ROOT_DIR)
+@task
+def install_byobu_bashrc():
+    """ Overwrites byobu's bashrc with canonical version from tplDir """
+    tplDir = os.path.join(MY_SHOVEL_ROOT_DIR, "templates")
+    tplBashrcPath = os.path.join(tplDir, "bashrc")
+    byobuBashrcPath = "/usr/share/byobu/profiles/bashrc"
+    owByobuBashrcCmd = "sudo cp {tplBashrcPath} {byobuBashrcPath}".format(
+        tplBashrcPath=tplBashrcPath,
+        byobuBashrcPath=byobuBashrcPath
+    )
+    run_shell_cmd(owByobuBashrcCmd)
 
