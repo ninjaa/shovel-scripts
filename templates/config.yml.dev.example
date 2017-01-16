@@ -1,13 +1,26 @@
 db_dump_location: /srv/www/dbdumps
 db_server: localhost
-db_server_root_password: DB_ROOT_PASS
+db_server_root_password: YOURPASSWORD
 db_server_root_username: root
 env: dev
 nginx_grp: www-data
 nginx_user: www-data
 ssh_grp: opsworks
-tld: tutoringclub.com
+tld: YOURTLD.COM
 www_dir: public_html
 www_grp: ec2-user
 www_root: /srv/www
 www_user: ec2-user
+apps:
+    www-new:
+        app_path_slug: www-new
+        web_url_slug: www
+        db_name: APP_DB_NAME
+        repo: YOURREPOURL
+    beta:
+        app_path_slug: www-beta
+        web_url_slug: beta
+        db_name: APP_DB_NAME_beta
+        repo: YOURREPOURL 
+
+
