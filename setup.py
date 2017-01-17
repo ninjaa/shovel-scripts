@@ -49,8 +49,8 @@ def setup_magento_server(
         run_shell_cmd("sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db")
         run_shell_cmd("sudo add-apt-repository 'deb [arch=amd64,i386,ppc64el] http://mirror.lstn.net/mariadb/repo/10.1/ubuntu trusty main'")
         run_shell_cmd("sudo apt-get update")
-        run_shell_cmd("sudo apt-get install -y mariadb-server")
-        run_shell_cmd("sudo mysql_secure_installation")
+        #run_shell_cmd("sudo apt-get install -y mariadb-server")
+        #run_shell_cmd("sudo mysql_secure_installation")
 
         run_shell_cmd("sudo add-apt-repository -y ppa:ondrej/php5-5.6")
         run_shell_cmd("sudo apt-get update")
@@ -62,4 +62,8 @@ def setup_magento_server(
         run_shell_cmd("sudo add-apt-repository -y ppa:nginx/stable")
         run_shell_cmd("sudo apt-get update")
         run_shell_cmd("sudo apt-get install -y nginx")
+
+        print("please run $> sudo apt-get install -y mariadb-server by hand")
+
+
 
