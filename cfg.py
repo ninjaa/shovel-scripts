@@ -26,12 +26,43 @@ if __package__ is None:
 
 # ## Relative imports
 from lib import (
-    cmd_offer_boolean_choice, 
-    CONFIG, 
-    get_strftime, 
+    cmd_offer_boolean_choice,
+    CONFIG,
+    get_strftime,
     MY_SHOVEL_ROOT_DIR,
     run_shell_cmd,
 )
+
+MY_APPS = CONFIG['apps']
+
+
+@task
+def ls_apps(apps=CONFIG['apps']):
+    ''' Helper function prints all apps in config.yml '''
+    print(apps.keys())
+
+
+@task
+def install_app(
+    appName,
+    env=CONFIG['env'],
+    tld=CONFIG['tld'],
+    wwwRoot=CONFIG['www_root'],
+    wwwDir=CONFIG['www_dir']
+):
+    ''' Installs an app of given appName if found in MY_APPS '''
+    if appName in MY_APPS.keys():
+        print("appName {} found".format(appName))
+    
+        appContainerDirname = "{}.{}".format(appName, tld)
+        appContainerDirPath = os.path.join(wwwRoot, appContainerDirname)
+        print("App Container Dir is found at {}".format(appContainerDirPath))
+        if not os.path.isdir(appContainerDirPath):
+            os.mkdir(appContainerDirPath, 0775)
+        
+        
+
+
 
 @task
 def ow_dot_examples(
@@ -42,7 +73,7 @@ def ow_dot_examples(
     wwwDir=CONFIG['www_dir'],
 ):
     '''Overwrite every filename with filename.{env}.examples if one is found in that folder
-    
+
     This command will scan the directory /{wwwRoot}/{appName}{tld}/{wwwDir} and copy over all files named *.{env}.example to the name of the file
 
     It takes 5 arguments, 4 arguments are mandatory:
@@ -70,6 +101,6 @@ def ow_dot_examples(
 
     for srcFile in matches:
         destFile = srcFile.replace(".{env}.example".format(env=env), "")
-        print("cp {srcFile} to {destFile}".format(srcFile=srcFile, destFile=destFile))
+        print("cp {srcFile} to {destFile}".format(
+            srcFile=srcFile, destFile=destFile))
         copyfile(srcFile, destFile)
-

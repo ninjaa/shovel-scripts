@@ -41,7 +41,7 @@ def setup_magento_server(
     env=CONFIG['env'],
     tld=CONFIG['tld'],
     wwwRoot=CONFIG['www_root'],
-    wwwDir=CONFIG['www_dir'],
+    wwwDir=CONFIG['www_dir']
 ):
     ''' Setup linux system suitable for installation of Magento 1.9.x '''
     # https://www.rosehosting.com/blog/install-magento-2-on-an-ubuntu-14-04-vps/
@@ -80,6 +80,9 @@ def cfg_magento_server(
     tld=CONFIG['tld'],
     wwwRoot=CONFIG['www_root'],
     wwwDir=CONFIG['www_dir'],
+    wwwUser=CONFIG['www_user'],
+    wwwGroup=CONFIG['www_grp'],
+    dbDumpLocation=CONFIG['db_dump_location'],
 ):
     ''' Configures installed packages '''
     if LINUX_DISTRO_FLAVOR == 'ubuntu' and LINUX_DISTRO_VERSION == '14.04':
@@ -105,7 +108,8 @@ def cfg_magento_server(
         # enable redis on startup
         run_shell_cmd("sudo update-rc.d redis_6379 defaults")
 
-        # overwrite /etc/php/5.6/fpm/php.ini from templateDir/ubuntu/14.04/etc/php/5.6/php.ini
+        # overwrite /etc/php/5.6/fpm/php.ini from
+        # templateDir/ubuntu/14.04/etc/php/5.6/php.ini
         phpIniSrcPath = os.path.join(
             TEMPLATE_DIR,
             LINUX_DISTRO_FLAVOR,
@@ -116,7 +120,8 @@ def cfg_magento_server(
             phpIniSrcPath, phpIniDestPath
         ))
 
-        # overwrite /etc/php/5.6/fpm/php.ini from templateDir/ubuntu/14.04/etc/php/5.6/php.ini
+        # overwrite /etc/php/5.6/fpm/php.ini from
+        # templateDir/ubuntu/14.04/etc/php/5.6/php.ini
         phpFpmPoolSrcPath = os.path.join(
             TEMPLATE_DIR,
             LINUX_DISTRO_FLAVOR,
@@ -128,5 +133,7 @@ def cfg_magento_server(
         ))
 
         run_shell_cmd("sudo service php5.6-fpm start")
-        
 
+        run_shell_cmd("sudo mkdir -p {}".format(dbDumpLocation))
+        run_shell_cmd(
+            "sudo chown -R {}:{} {}".format(wwwUser, wwwGroup, wwwRoot))
