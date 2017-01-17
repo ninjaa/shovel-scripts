@@ -52,9 +52,9 @@ def setup_magento_server(
         #run_shell_cmd("sudo apt-get install -y mariadb-server")
         #run_shell_cmd("sudo mysql_secure_installation")
 
-        run_shell_cmd("sudo add-apt-repository -y ppa:ondrej/php5-5.6")
+        run_shell_cmd("sudo add-apt-repository -y ppa:ondrej/php")
         run_shell_cmd("sudo apt-get update")
-        run_shell_cmd("sudo apt-get -y install php5-fpm php5-cli php5-gd php5-imagick php5-mysqlnd php5-mcrypt php-pear php5-curl php5-intl php5-gd php5-xs")
+        run_shell_cmd("sudo apt-get install -y php5.6-fpm php5.6-cli php5.6-gd php5.6-imagick php5.6-mysqlnd php5.6-mcrypt php-pear php5.6-curl php5.6-intl php5.6-gd php5.6-xs")
 
         run_shell_cmd("curl -sS https://getcomposer.org/installer | php")
         run_shell_cmd("sudo mv composer.phar /usr/local/bin/composer")
