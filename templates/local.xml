@@ -36,7 +36,7 @@
                 <port>6379</port>
                 <persistent></persistent>
                 <!-- Specify unique string to enable persistent connections. E.g.: sess-db0; bugs with phpredis and php-fpm are known: https://github.com/nicolasff/phpredis/issues/70 -->
-                <database>{{redisCacheDb}}</database>
+                <database>{{cfg['redis_cache_db']}}</database>
                 <!-- Redis database number; protection against accidental data loss is improved by not sharing databases -->
                 <password></password>
                 <!-- Specify if your Redis server requires authentication -->
@@ -80,16 +80,16 @@
             <default_setup>
                 <connection>
                     <host>
-                        <![CDATA[{{dbServer}}:3306]]>
+                        <![CDATA[{{cfg['db_server']}}:3306]]>
                     </host>
                     <username>
-                        <![CDATA[{{dbUsername}}]]>
+                        <![CDATA[{{cfg['db_user']}}]]>
                     </username>
                     <password>
-                        <![CDATA[{{dbPassword}}]]>
+                        <![CDATA[{{cfg['db_password']}}]]>
                     </password>
                     <dbname>
-                        <![CDATA[{{dbName}}]]>
+                        <![CDATA[{{cfg['db_name']}}]]>
                     </dbname>
                     <initStatements>
                         <![CDATA[SET NAMES utf8]]>
@@ -121,7 +121,7 @@
             <!-- This is the Redis connection timeout, not the locking timeout -->
             <persistent></persistent>
             <!-- Specify unique string to enable persistent connections. E.g.: sess-db0; bugs with phpredis and php-fpm are known: https://github.com/nicolasff/phpredis/issues/70 -->
-            <db>{{redisSessionDb}}</db>
+            <db>{{cfg['redis_session_db']}}</db>
             <!-- Redis database number; protection from accidental loss is improved by using a unique DB number for sessions -->
             <compression_threshold>2048</compression_threshold>
             <!-- Set to 0 to disable compression (recommended when suhosin.session.encrypt=on); known bug with strings over 64k: https://github.com/colinmollenhour/Cm_Cache_Backend_Redis/issues/18 -->
@@ -155,7 +155,7 @@
             <adminhtml>
                 <args>
                     <frontName>
-                        <![CDATA[{{adminSlug}}]]>
+                        <![CDATA[{{cfg['admin_slug']}}]]>
                     </frontName>
                 </args>
             </adminhtml>

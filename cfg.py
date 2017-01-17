@@ -31,6 +31,7 @@ from lib import (
     get_strftime,
     MY_SHOVEL_ROOT_DIR,
     run_shell_cmd,
+    TEMPLATE_DIR,
 )
 
 MY_APPS = CONFIG['apps']
@@ -41,6 +42,37 @@ def ls_apps(apps=CONFIG['apps']):
     ''' Helper function prints all apps in config.yml '''
     print(apps.keys())
 
+@task
+def fix_permissions(
+    appName, 
+    dirPermissions=0775, 
+    filePermissions=0664,
+    env=CONFIG['env'],
+    tld=CONFIG['tld'],
+    wwwRoot=CONFIG['www_root'],
+):
+    ''' chmods appropriately '''
+    if appName in MY_APPS.keys():
+        print("appName {} found".format(appName))
+        appConf = MY_APPS[appName]
+
+        appContainerDirname = "{}.{}".format(appName, tld)
+        appContainerDirPath = os.path.join(wwwRoot, appContainerDirname)
+        print("App Container Dir is found at {}".format(appContainerDirPath))
+
+        for root, subdirs, files in os.walk(appContainerDirPath):
+            print files
+            # for subdir in subdirs:
+            #     run_shell_cmd("sudo chmod {dirPermissions} {subdir}".format(
+            #         dirPermissions=dirPermissions,
+            #         subdir=subdir
+            #     ))
+            # for filename in files:
+            #     run_shell_cmd("sudo chmod {filePermissions} {filename}".format(
+            #         dirPermissions=dirPermissions,
+            #         filename=filename
+            #     ))
+
 
 @task
 def install_app(
@@ -48,18 +80,45 @@ def install_app(
     env=CONFIG['env'],
     tld=CONFIG['tld'],
     wwwRoot=CONFIG['www_root'],
-    wwwDir=CONFIG['www_dir']
+    wwwDir=CONFIG['www_dir'], 
+    templateDir=TEMPLATE_DIR,
 ):
     ''' Installs an app of given appName if found in MY_APPS '''
     if appName in MY_APPS.keys():
         print("appName {} found".format(appName))
-    
+        appConf = MY_APPS[appName]
+
         appContainerDirname = "{}.{}".format(appName, tld)
         appContainerDirPath = os.path.join(wwwRoot, appContainerDirname)
         print("App Container Dir is found at {}".format(appContainerDirPath))
         if not os.path.isdir(appContainerDirPath):
             os.mkdir(appContainerDirPath, 0775)
         
+        appRoot = os.path.join(appContainerDirPath, wwwDir)
+        if not os.path.isdir(appRoot):
+            run_shell_cmd("git clone {appGitOrigin} {appRoot}".format(
+                appGitOrigin=appConf['repo'],
+                appRoot=appRoot
+            ))
+        
+        # generate vhost.conf
+
+        # generate local.xml
+
+        templateLoader = jinja2.FileSystemLoader(searchpath=TEMPLATE_DIR)
+        templateEnv = jinja2.Environment(loader=templateLoader)
+
+        for filename in appConf['generated_files'].keys():
+            destPath = os.path.join(appRoot, appConf['generated_files'][filename])
+            tpl = templateEnv.get_template(filename)
+            output = tpl.render({ "cfg": appConf })
+            with open(destPath, "wb") as outfile:
+                outfile.write(output)
+            print("printed out {filename} to {destPath}".format(
+                filename=filename,
+                destPath=destPath,
+            ))
+
         
 
 
