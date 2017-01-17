@@ -1,26 +1,35 @@
-db_dump_location: /srv/www/dbdumps
+db_dump_location: /var/www/dbdumps
 db_server: localhost
-db_server_root_password: DB_ROOT_PASS
+db_server_root_password: 123
 db_server_root_username: root
 env: local
 nginx_grp: www-data
 nginx_user: www-data
-ssh_grp: opsworks
-tld: YOURTLD
+php-sock: /run/php/php5.6-fpm.sock
+ssh_grp: aditya
+tld: 1stopmart.in
 www_dir: public_html
-www_grp: ec2-user
-www_root: /srv/www
-www_user: ec2-user
+www_grp: aditya
+www_root: /var/www
+www_user: aditya
 apps:
-    www-new:
-        app_path_slug: www-new
-        web_url_slug: www
-        db_name: APP_DB_NAME
-        repo: YOURREPOURL
-    beta:
-        app_path_slug: www-beta
-        web_url_slug: beta
-        db_name: APP_DB_NAME_beta
-        repo: YOURREPOURL 
+    aditya-local1:
+        app_path_slug: aditya-local1
+        web_url_slug: aditya-local1
+        db_name: INSTANCE_DB_NAME
+        db_user: INSTANCE_DB_USER
+        db_pass: INSTANCE_DB_PASS
+        redis_cache_db: 1
+        redis_session_db: 0
+        repo: GIT_REMOTE_URL
+    aditya-local2:
+        app_path_slug: aditya-local2
+        web_url_slug: aditya-local2
+        db_name: INSTANCE_DB_NAME
+        db_user: INSTANCE_DB_USER
+        db_pass: INSTANCE_DB_PASS
+        redis_cache_db: 3
+        redis_session_db: 2
+        repo: GIT_REMOTE_URL
 
 
