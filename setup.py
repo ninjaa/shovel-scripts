@@ -63,6 +63,8 @@ def setup_magento_server(
         run_shell_cmd("sudo apt-get update")
         run_shell_cmd("sudo apt-get install -y nginx")
 
+        run_shell_cmd("sudo apt-get install -y redis-server")
+
         print("please run $> sudo apt-get install -y mariadb-server by hand")
 
 
