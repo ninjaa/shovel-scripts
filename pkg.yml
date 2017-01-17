@@ -1,0 +1,5 @@
+rhel:
+    MySQL-python
+ubuntu:
+    python-pip
+    python-mysql
