@@ -43,7 +43,7 @@ def setup_magento_server(
 ):
     ''' Setup linux system suitable for installation of Magento 1.9.x '''
     # https://www.rosehosting.com/blog/install-magento-2-on-an-ubuntu-14-04-vps/
-    if LINUX_DISTRO_FLAVOR == 'ubuntu' and LINUX_DISTRO_VERSION.split('.')[0] == 14:
+    if LINUX_DISTRO_FLAVOR == 'ubuntu' and LINUX_DISTRO_VERSION == '14.04':
         run_shell_cmd("sudo apt-get update && sudo apt-get -y upgrade")
         run_shell_cmd("sudo apt-get install -y software-properties-common curl nano")
         run_shell_cmd("sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db")
