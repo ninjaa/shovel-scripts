@@ -23,6 +23,16 @@ TEMPLATE_DIR = os.path.join(MY_SHOVEL_ROOT_DIR, "templates")
 if __package__ is None:
     sys.path.append(MY_SHOVEL_ROOT_DIR)
 
+def merge_dicts(*dict_args):
+    """
+    Given any number of dicts, shallow copy and merge into a new dict,
+    precedence goes to key value pairs in latter dicts.
+    """
+    result = {}
+    for dictionary in dict_args:
+        result.update(dictionary)
+    return result
+
 # not a @task
 def run_shell_cmd(cmd, printCmd=True):
     ''' helper function to run shell command v2 '''

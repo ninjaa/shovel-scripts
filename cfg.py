@@ -29,6 +29,7 @@ from lib import (
     cmd_offer_boolean_choice,
     CONFIG,
     get_strftime,
+    merge_dicts,
     MY_SHOVEL_ROOT_DIR,
     run_shell_cmd,
     TEMPLATE_DIR,
@@ -81,14 +82,20 @@ def install_app(
     tld=CONFIG['tld'],
     wwwRoot=CONFIG['www_root'],
     wwwDir=CONFIG['www_dir'], 
+    wwwUser=CONFIG['www_user'],
+    wwwGroup=CONFIG['www_grp'],
     templateDir=TEMPLATE_DIR,
+    nginxVhostRoot=CONFIG['nginx_vhost_root']
 ):
     ''' Installs an app of given appName if found in MY_APPS '''
     if appName in MY_APPS.keys():
         print("appName {} found".format(appName))
-        appConf = MY_APPS[appName]
+        appConf = merge_dicts(CONFIG, MY_APPS[appName])
+        print appConf
+        appConf['app_name'] = appName
 
         appContainerDirname = "{}.{}".format(appName, tld)
+        appConf['fqdn'] = appContainerDirname
         appContainerDirPath = os.path.join(wwwRoot, appContainerDirname)
         print("App Container Dir is found at {}".format(appContainerDirPath))
         if not os.path.isdir(appContainerDirPath):
@@ -100,13 +107,28 @@ def install_app(
                 appGitOrigin=appConf['repo'],
                 appRoot=appRoot
             ))
-        
+
+        templateLoader = jinja2.FileSystemLoader(searchpath=templateDir)
+        templateEnv = jinja2.Environment(loader=templateLoader)
+
         # generate vhost.conf
+        filename = appContainerDirname + ".conf"
+        run_shell_cmd("sudo chown -R {wwwUser}:{wwwGroup} {nginxVhostRoot}".format(
+            wwwUser=wwwUser,
+            wwwGroup=wwwGroup,
+            nginxVhostRoot=nginxVhostRoot
+        ))
+        destPath = os.path.join(nginxVhostRoot, filename)
+        tpl = templateEnv.get_template(appConf['vhost_conf_tpl'])
+        output = tpl.render(appConf)
+        with open(destPath, "wb") as outfile:
+            outfile.write(output)
+        print("printed out {filename} to {destPath}".format(
+            filename=filename,
+            destPath=destPath
+        ))
 
         # generate local.xml
-
-        templateLoader = jinja2.FileSystemLoader(searchpath=TEMPLATE_DIR)
-        templateEnv = jinja2.Environment(loader=templateLoader)
 
         for filename in appConf['generated_files'].keys():
             destPath = os.path.join(appRoot, appConf['generated_files'][filename])
@@ -118,7 +140,8 @@ def install_app(
                 filename=filename,
                 destPath=destPath,
             ))
-
+        
+        # restart server
         
 
 
