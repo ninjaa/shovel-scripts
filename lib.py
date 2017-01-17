@@ -87,7 +87,28 @@ else:
     print("Warning! no suitable linux distro found")
     print(LINUX_DISTRO_TUPLE)
     LINUX_DISTRO_FLAVOR = 'unknown'
-    
+
+def restart_redis():
+    if LINUX_DISTRO_FLAVOR == 'ubuntu' and LINUX_DISTRO_VERSION == '14.04':
+        cmd = "sudo service redis-server restart"
+    else:
+        cmd = "sudo systemctl restart redis"    
+    run_shell_cmd(cmd)
+
+def restart_nginx():
+    if LINUX_DISTRO_FLAVOR == 'ubuntu' and LINUX_DISTRO_VERSION == '14.04':
+        cmd = "sudo service nginx restart"
+    else:
+        cmd = "sudo systemctl restart nginx"    
+    run_shell_cmd(cmd)
+
+def restart_redis():
+    if LINUX_DISTRO_FLAVOR == 'ubuntu' and LINUX_DISTRO_VERSION == '14.04':
+        cmd = "sudo service redis-server restart"
+    else:
+        cmd = "sudo systemctl restart redis"    
+    run_shell_cmd(cmd)
+
 #scriptPath = os.path.dirname(os.path.abspath(__file__))
 
 def cmd_offer_boolean_choice(question):

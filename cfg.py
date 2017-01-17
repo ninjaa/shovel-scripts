@@ -78,6 +78,7 @@ def fix_permissions(
 @task
 def install_app(
     appName,
+    newBranch=False,
     env=CONFIG['env'],
     tld=CONFIG['tld'],
     wwwRoot=CONFIG['www_root'],
@@ -102,11 +103,32 @@ def install_app(
             os.mkdir(appContainerDirPath, 0775)
         
         appRoot = os.path.join(appContainerDirPath, wwwDir)
+        appConf['app_root'] = appRoot
         if not os.path.isdir(appRoot):
             run_shell_cmd("git clone {appGitOrigin} {appRoot}".format(
                 appGitOrigin=appConf['repo'],
                 appRoot=appRoot
             ))
+
+        # checkout branch
+        if appConf['branch']:
+            cwd = os.getcwd()
+            os.chdir(appRoot)
+            run_shell_cmd("git checkout {branchName}".format(
+                branchName=appConf['branch']))
+            os.chdir(cwd)
+        
+        # checkout new branch if explicitly named
+        if newBranch:
+            cwd = os.getcwd()
+            os.chdir(appRoot)
+            run_shell_cmd("get checkout -b {newBranch}".format(
+                newBranch=newBranch
+            ))
+            run_shell_cmd("get push -u origin {newBranch}".format(
+                newBranch=newBranch
+            ))
+            os.chdir(cwd)
 
         templateLoader = jinja2.FileSystemLoader(searchpath=templateDir)
         templateEnv = jinja2.Environment(loader=templateLoader)
@@ -128,6 +150,7 @@ def install_app(
             destPath=destPath
         ))
 
+
         # generate local.xml
 
         for filename in appConf['generated_files'].keys():
@@ -140,6 +163,9 @@ def install_app(
                 filename=filename,
                 destPath=destPath,
             ))
+
+        # overwrite example files
+        ow_dot_examples(appName, env, tld, wwwRoot, wwwDir)
         
         # restart server
         
