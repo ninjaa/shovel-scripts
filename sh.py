@@ -20,6 +20,7 @@ from lib import (
     cmd_offer_boolean_choice, 
     CONFIG, 
     get_strftime, 
+    MY_HOME_DIR,
     MY_SHOVEL_ROOT_DIR,
     run_shell_cmd,
 )
@@ -36,3 +37,14 @@ def install_byobu_bashrc():
     )
     run_shell_cmd(owByobuBashrcCmd)
 
+@task
+def install_local_bashrc():
+    """ Overwrites local bashrc with canonical version from tplDir """
+    tplDir = os.path.join(MY_SHOVEL_ROOT_DIR, "templates")
+    tplBashrcPath = os.path.join(tplDir, "bashrc.local.2.example")
+    myBashrcPath = os.path.join(MY_HOME_DIR, ".bashrc")
+    owBashrcCmd = "cp {tplBashrcPath} {myBashrcPath}".format(
+        tplBashrcPath=tplBashrcPath,
+        myBashrcPath=myBashrcPath
+    )
+    run_shell_cmd(owBashrcCmd)
