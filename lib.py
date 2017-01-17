@@ -23,36 +23,6 @@ TEMPLATE_DIR = os.path.join(MY_SHOVEL_ROOT_DIR, "templates")
 if __package__ is None:
     sys.path.append(MY_SHOVEL_ROOT_DIR)
 
-def load_config():
-    configFileReader = file(CONFIG_FILE_PATH, 'r')
-    config = yaml.load(configFileReader)
-    return config
-
-CONFIG = load_config()
-
-LINUX_DISTRO_TUPLE = platform.linux_distribution()
-LINUX_DISTRO_FULL_FLAVOR = LINUX_DISTRO_TUPLE[0]
-LINUX_DISTRO_VERSION = LINUX_DISTRO_TUPLE[1]
-
-if LINUX_DISTRO_FULL_FLAVOR == 'Red Hat Enterprise Linux':
-    LINUX_DISTRO_FLAVOR = 'rhel'
-elif LINUX_DISTRO_FULL_FLAVOR == 'Ubuntu':
-    LINUX_DISTRO_FLAVOR = 'ubuntu'
-
-#scriptPath = os.path.dirname(os.path.abspath(__file__))
-
-def cmd_offer_boolean_choice(question):
-    print(question + " (Answer [Y/N] and press Enter) ")
-    return strtobool(raw_input())
-
-# not a @task
-def get_strftime(timePattern="%Y%m%d"):
-	""" returns date string eg 20170107 """
-	timestr = strftime(timePattern, gmtime())
-	print(timestr)
-	return timestr
-
-
 # not a @task
 def run_shell_cmd(cmd, printCmd=True):
     ''' helper function to run shell command v2 '''
@@ -72,9 +42,55 @@ def run_shell_command(cmdstr):
     return exitcode, out, err
 
 @task
-def gen_cfg_yml():
+def gen_cfg_yml(env="dev"):
     ''' Generate config.yml from tpl '''
-    pass
+    run_shell_cmd("cp {xmplPath} {cfgPath}".format(
+        xmplPath=os.path.join(
+            MY_SHOVEL_ROOT_DIR, 
+            "templates", 
+            "config.yml.{env}.example".format(env=env)
+        ),  cfgPath=CONFIG_FILE_PATH
+    ))
+
+def load_config():
+    if not os.path.isfile(CONFIG_FILE_PATH):
+        gen_cfg_yml()
+
+    if os.path.isfile(CONFIG_FILE_PATH):
+        configFileReader = file(CONFIG_FILE_PATH, 'r')
+        config = yaml.load(configFileReader)
+        return config
+    else:
+        return {}
+
+CONFIG = load_config()
+
+LINUX_DISTRO_TUPLE = platform.linux_distribution()
+LINUX_DISTRO_FULL_FLAVOR = LINUX_DISTRO_TUPLE[0]
+LINUX_DISTRO_VERSION = LINUX_DISTRO_TUPLE[1]
+
+if LINUX_DISTRO_FULL_FLAVOR == 'Red Hat Enterprise Linux Server':
+    LINUX_DISTRO_FLAVOR = 'rhel'
+elif LINUX_DISTRO_FULL_FLAVOR == 'Ubuntu':
+    LINUX_DISTRO_FLAVOR = 'ubuntu'
+else: 
+    print("Warning! no suitable linux distro found")
+    print(LINUX_DISTRO_TUPLE)
+    LINUX_DISTRO_FLAVOR = 'unknown'
+    
+#scriptPath = os.path.dirname(os.path.abspath(__file__))
+
+def cmd_offer_boolean_choice(question):
+    print(question + " (Answer [Y/N] and press Enter) ")
+    return strtobool(raw_input())
+
+# not a @task
+def get_strftime(timePattern="%Y%m%d"):
+	""" returns date string eg 20170107 """
+	timestr = strftime(timePattern, gmtime())
+	print(timestr)
+	return timestr
+
 
 @task
 def show_cfg():

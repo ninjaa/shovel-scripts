@@ -14,6 +14,12 @@ import sys
 from time import gmtime, strftime
 import yaml
 
+MY_HOME_DIR = os.environ['HOME']
+MY_SHOVEL_ROOT_DIR = os.path.join(MY_HOME_DIR, ".shovel")
+
+# the following line allows local imports from pwd
+if __package__ is None:
+    sys.path.append(MY_SHOVEL_ROOT_DIR)
 
 # ## Relative imports
 from lib import (
