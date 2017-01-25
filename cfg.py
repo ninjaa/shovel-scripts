@@ -86,7 +86,9 @@ def install_app(
     wwwUser=CONFIG['www_user'],
     wwwGroup=CONFIG['www_grp'],
     templateDir=TEMPLATE_DIR,
-    nginxVhostRoot=CONFIG['nginx_vhost_root']
+    nginxVhostRoot=CONFIG['nginx_vhost_root'],
+    nginxUser=CONFIG['nginx_user'],
+    nginxGroup=CONFIG['nginx_grp']
 ):
     ''' Installs an app of given appName if found in MY_APPS '''
     if appName in MY_APPS.keys():
@@ -166,7 +168,21 @@ def install_app(
 
         # overwrite example files
         ow_dot_examples(appName, env, tld, wwwRoot, wwwDir)
-        
+
+        # create writable folders if required
+        for writableFolder in appConf['writable_folders']:
+            writableFolderPath = os.path.join(appRoot, writableFolder)
+            if not os.path.isdir(writableFolderPath):
+                os.mkdir(writableFolderPath, 0775)
+            
+            if os.path.isdir(writableFolderPath):
+                run_shell_cmd("sudo chmod -R {nginxUser}:{nginxGroup} {writableFolderPath}".format(
+                    nginxUser=nginxUser,
+                    nginxGroup=nginxGroup,
+                    writableFolderPath=writableFolderPath
+                ))
+
+        # fix_permissions
         # restart server
         
 
