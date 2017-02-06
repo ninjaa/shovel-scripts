@@ -53,3 +53,7 @@ $> make && make install
 ubuntu@lemp4:/usr/src/s3fs-1.74 ⟫ echo AWS_ACCESS_KEY_ID:AWS_SECRET_ACCESS_KEY > ~/.passwd-s3fs
 ubuntu@lemp4:/usr/src/s3fs-1.74 ⟫ chmod 600 ~/.passwd-s3fs
 
+### Modifications for Windows 10 Bash
+
+[These instructions](https://www.svennd.be/running-nginx-on-bash-for-windows-10/) were muy helpful 
+
