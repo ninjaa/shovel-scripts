@@ -200,6 +200,8 @@ def ow_dot_examples(
     devRootPath = os.path.join("/", wwwRoot, devFolderName)
     devWebRootPath = os.path.join(devRootPath, wwwDir)
     searchPattern = "*.{env}.example".format(env=env)
+    print devWebRootPath
+    print searchPattern
     matches = []
     for root, dirnames, filenames in os.walk(devWebRootPath):
         for filename in fnmatch.filter(filenames, searchPattern):
