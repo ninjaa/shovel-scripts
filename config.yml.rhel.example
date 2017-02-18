@@ -1,0 +1,27 @@
+db_dump_location: /var/www/dbdumps
+db_server: localhost
+db_server_root_password: YOURPASSWORD
+db_server_root_username: root
+env: dev
+nginx_grp: nginx
+nginx_user: nginx
+nginx_vhost_root: /etc/nginx/conf.d
+ssh_grp: opsworks
+tld: bulkmro.com
+www_dir: public_html
+www_grp: ec2-user
+www_root: /var/www
+www_user: ec2-user
+apps:
+    www-new:
+        app_path_slug: www-new
+        web_url_slug: www
+        db_name: APP_DB_NAME
+        repo: YOURREPOURL
+    beta:
+        app_path_slug: www-beta
+        web_url_slug: beta
+        db_name: APP_DB_NAME_beta
+        repo: YOURREPOURL 
+
+
