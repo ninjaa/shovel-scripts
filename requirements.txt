@@ -71,7 +71,7 @@ pyzmq==16.0.2
 requests==2.6.0
 rhnlib==2.5.65
 rhsm==1.17.9
-rsa==3.4.2
+rsa==4.1
 ruamel.base==1.0.0
 ruamel.ordereddict==0.4.9
 ruamel.std.argparse==0.6.0
