@@ -92,7 +92,7 @@ tornado==4.4.2
 traitlets==4.3.1
 typing==3.5.3.0
 urlgrabber==3.10
-urllib3==1.10.2
+urllib3==1.26.5
 wcwidth==0.1.7
 widgetsnbextension==1.2.6
 yum-metadata-parser==1.1.4
