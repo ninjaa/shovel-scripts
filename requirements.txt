@@ -1,5 +1,5 @@
 awscli==1.11.21
-Babel==0.9.6
+Babel==2.9.1
 backports-abc==0.5
 backports.shutil-get-terminal-size==1.0.0
 backports.ssl-match-hostname==3.4.0.2
