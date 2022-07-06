@@ -20,7 +20,7 @@ enum34==1.1.6
 ethtool==0.8
 functools32==3.2.3.post2
 futures==3.0.5
-html5lib==0.9999999
+html5lib==0.999999999
 iniparse==0.4
 IPy==0.75
 ipykernel==4.5.2
