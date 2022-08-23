@@ -42,7 +42,7 @@ Magic-file-extensions==0.2
 MarkupSafe==0.23
 mistune==0.7.3
 MySQL-python==1.2.5
-nbconvert==5.0.0
+nbconvert==6.5.1
 nbformat==4.2.0
 notebook==4.3.1
 pandocfilters==1.4.1
